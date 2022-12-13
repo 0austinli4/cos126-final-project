@@ -11,6 +11,7 @@ public class TextGenerator {
     }
 
     public static String[] textOrganization() {
+        System.out.println("wdawdwa");
         String[] names = {"Jasmine", "Sol", "irene", "David", "Joshua", "Sophie"};
         String[] individualText = new String[names.length];
 
