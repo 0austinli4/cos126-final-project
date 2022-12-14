@@ -9,11 +9,12 @@ public class TextGenerator {
 
     // splits text file up into parallel string arrays matched by person
     // implements cleanText to remove dates/times / unnecessary texts or symbols
+    // COMMON WORD: WORKS
+    // REMOVE SYMBOLS WORKS
     public static String[] cleanText(String[] names) {
         String[] individualText = new String[names.length];
 
         int person = 0;
-
         while (!StdIn.isEmpty()) {
             String word = StdIn.readString();
             for (int j = 0; j < names.length; j++) {
@@ -30,8 +31,11 @@ public class TextGenerator {
                 individualText[person] = individualText[person] + word + " ";
             }
         }
+
         for (int i = 0; i < individualText.length; i++) {
-            individualText[i] = removeSymbols(individualText[i]) + "\n"; // removes symbols
+            //System.out.println(names[i] + ": " + individualText[i]);
+            individualText[i] = removeSymbols(individualText[i]); // removes symbols
+            //+ "\n"
             // new line at end of every string for readability
         }
         return individualText; //returns String array
@@ -40,7 +44,7 @@ public class TextGenerator {
     // helper method for inByPerson, removing common words such at time stamps, dates, months
     public static boolean commonWord(String input) {
         String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|((Mon),?)|((Tue),?)|((Wed),?)|((Thu),?)|((Fri),?)" +
-                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)";
+                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)|(,)|(^)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
@@ -48,85 +52,131 @@ public class TextGenerator {
 
     // helper method for inByPerson, removes all non-ascii characters and returns String
     public static String removeSymbols(String text) {
+
         StringBuilder cleanText = new StringBuilder();
+
         for (int i = 0; i < text.length(); i++) {
             if ((int) text.charAt(i) < 127) {
                 cleanText.append(text.charAt(i));
             }
         }
+        if (cleanText.indexOf("null") != -1) {
+            cleanText.delete(cleanText.indexOf("null"), cleanText.indexOf("null") + 4);
+        }
         return cleanText.toString();
     }
 
-    // prints the text of individual person, also returns their textString
-    public static String printByPerson(String[] organized, String[] names, int numPerson) {
-        System.out.print(names[numPerson] + "'s texts: " + organized[numPerson]);
-        return organized[numPerson];
-    }
-
-    // SIMULATE A TEXT CONVERSATION
-    public static String simulate(String topicWords, String input2) {
-
-        String temp = input2;
-        int position = 0;
-        int index;
-        while (temp.contains(" ")) {
-            index = temp.indexOf(" ");
-            String word = (temp.substring(position, index));
-
-            /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
-
-            position = index + 1;
-            temp = temp.substring(position);
-            position = 0;
-        }
-        System.out.print(temp); //LAST WORD
-        return "";
-    }
-
-    public static String first5last5(String topicWord, String searchFile) {
+    public static String keySentence(String topicWord, String searchFile) {
         StringBuilder keyWordString = new StringBuilder();
         String temp = searchFile;
 
         while (temp.contains(topicWord)) {
+            //System.out.println("temp is now : " + temp);
             int index = temp.indexOf(topicWord);
-            System.out.println("index of mother is: " + index);
-            int range = 20;
+            int range = 50;
+            int length = topicWord.length();
 
-            if (index > range && index < (temp.length() - range - 5)) {
-                keyWordString.append(temp, index - range, index + 5 + range);
-                temp = temp.substring(index + range + 1);
-                System.out.println("temp is: " + temp);
-            } else if (index > (temp.length() - range - 5)) { //case for END OF STRING
-                keyWordString.append(temp, index - range, searchFile.length());
+            if (index > range && index < (temp.length() - range - length)) {
+                keyWordString.append(temp, index - range, index + length + range);
+                temp = temp.substring(index + range + length);
+
+            } else if (index < range && index > (temp.length() - range - length)) { //case for END OF STRING
+                keyWordString.append(temp);
+                temp = "";
+            } else if (index > (temp.length() - range - length)) { //case for END OF STRING
+                //System.out.println("temp is more than string, index is: " + index);
+                keyWordString.append(temp, index - range, temp.length());
+//                System.out.println("appended: " + keyWordString.toString());
+                temp = "";
+            } else if (index < range) { //case for START OF STRING
+                //System.out.println("index is less than string");
+                keyWordString.append(temp, 0, index + length + range);
+                temp = temp.substring(index + range + length);
+            } else {
                 temp = "";
             }
             keyWordString.append("\n");
+        }
+        keyWordString.append("\n");
 
+        //IF KEY WORDS DON"T EXIST NOT ENOUGH
+        if (keyWordString.length() < 10) {
+            System.out.println("key words weren't found");
+            return searchFile;
         }
 
         return keyWordString.toString();
     }
 
 
-    // splits larger text in string (i.e. full sentence) into individual strings -
-    // maybe put them in an array? or just add code to this method for frequency table
-    public static void splitString(String input) {
-        String temp = input;
-        int position = 0;
-        int index;
-        while (temp.contains(" ")) {
-            index = temp.indexOf(" ");
-            String word = (temp.substring(position, index));
+    public static void simulateMarkov(int k, int t, String[] organizedByPerson, int person1, int person2, String topicWord) {
+        String[] names = {"Jasmine", "Sol", "irene", "David", "Joshua", "Sophie"};
 
-            /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
-            updateFrequencies(word);
+        organizedByPerson[person1] = keySentence(topicWord, organizedByPerson[person1]);
+        organizedByPerson[person2] = keySentence(topicWord, organizedByPerson[person2]);
 
-            position = index + 1;
-            temp = temp.substring(position);
-            position = 0;
+        String inputText1 = organizedByPerson[person1];
+        String inputText2 = organizedByPerson[person2];
+
+        //printing input texts after finding key sentences
+//        System.out.println("INPUT TEXT 1: " + inputText1);
+//        System.out.println("INPUT TEXT 2: " + inputText2);
+
+        //print markov model for person n
+        MarkovModel model1 = new MarkovModel(inputText1, k);
+        MarkovModel model2 = new MarkovModel(inputText2, k);
+
+        int stringPosition = 0;
+        for (int count = 0; count < 4; count++) {
+            //PERSON 1
+            String kGram = inputText1.substring(stringPosition, k + stringPosition); // kgram based on input text
+            StdOut.printf(names[person1] + " SAYS: " + kGram);
+
+            for (int i = 0; i < t - k; i++) {
+                char temp = model1.random(kGram); // generate new random character
+                StdOut.print(temp);
+                kGram = kGram + temp;
+                kGram = kGram.substring(1, k + 1); // remove first original character
+            }
+            StdOut.println(); // extra line for readability
+
+            //PERSON 2
+            String kGram1 = inputText2.substring(stringPosition, k + stringPosition); // kgram based on input text
+            StdOut.printf(names[person2] + " SAYS: " + kGram1);
+
+            for (int i = 0; i < t - k; i++) {
+                char temp = model2.random(kGram1); // generate new random character
+                StdOut.print(temp);
+                kGram1 = kGram1 + temp;
+                kGram1 = kGram1.substring(1, k + 1); // remove first original character
+            }
+            StdOut.println(); // extra line for readability
+
+            stringPosition++;
         }
-        updateFrequencies(temp);
-        System.out.print(temp); //LAST WORD
+    }
+
+    public static void deleteNull(String[] organizedByPerson) {
+        for (int i = 0; i < organizedByPerson.length; i++) {
+            if (organizedByPerson[i].contains("null")) {
+                organizedByPerson[i] = organizedByPerson[i].replaceAll("null", "");
+            }
+            if (organizedByPerson[i].contains("\n")) {
+                organizedByPerson[i] = organizedByPerson[i].replaceAll("\n", "");
+            }
+
+        }
+    }
+
+
+    //DATA ANALYSIS SECTIONS
+    // splits strings and updates frequency tables
+    public static void splitString(String input) {
+        String[] splitString = input.split(" +");
+        for (String s : splitString) {
+            //System.out.println(s);
+            updateFrequencies(s);
+        }
     }
 
     public static void updateFrequencies(String word) {
@@ -149,7 +199,6 @@ public class TextGenerator {
         return least;
     }
 
-
     public static Map<String, Integer> topFrequencies() {
         int first10Check = 0;
         String firstString = "";
@@ -160,11 +209,9 @@ public class TextGenerator {
             if (first10Check > 10) {
                 break;
             }
-
             first10Check++;
             top10.put(key, freqs.get(key));
         }
-
 
         for (String key : freqs.keySet()) {
             String least = firstString;
@@ -181,18 +228,23 @@ public class TextGenerator {
 
     // Test generator creates trajectory of length t based on markov class
     public static void main(String[] args) {
-
         int k = Integer.parseInt(args[0]);  // order k for markov model
         int t = Integer.parseInt(args[1]);  // length of generated trajectory
 
         //initiating an array with all texts person has sent from text file
         String[] names = {"Jasmine", "Sol", "irene", "David", "Joshua", "Sophie"};
         String[] organizedByPerson = cleanText(names);
+        deleteNull(organizedByPerson);
+
+        simulateMarkov(k, t, organizedByPerson, 1, 2, "come");
+
+        //testing delete null
+        // String[] nuller = {"null adiawndowi"};
+        //deleteNull(nuller);
+        //System.out.print(nuller[0]);
 
         //printing an indivdual person's texts
-        int n = 3;
-        //String inputText = printByPerson(organizedByPerson, names, n);
-        String inputText = organizedByPerson[5];
+        //String inputText = organizedByPerson[5];
         //System.out.print(inputText);
 
         //TESTING splitString
@@ -205,44 +257,44 @@ public class TextGenerator {
 //        System.out.println(commonWord(common));
 //        System.out.println(commonWord(tuesdaycomma));
 
-        //first5last TESTING
-        String tester = "I really like to eat the food that my mother cooks every night when I come home and then I " +
-                "really really like when I get to eat my mother good food always";
-        System.out.print(first5last5("mother", tester));
+        //TESTING KEY SENTENCES TESTING
+        String tester = "I just be that motherfucker bumping n shit and then I just go to the gym and keep on " +
+                "eating shit because that's what i like to do when i come to the library so shit man";
+        //System.out.print(keySentence("shit", tester));
+
+        //testing simulate
+        //PERSON 1
+//        String inputText = organizedByPerson[0];
+//        MarkovModel model = new MarkovModel(inputText, k);
+//
+//        for (int count = 0; count < 3; count++) {
+//            String kGram = inputText.substring(0, k); // kgram based on input text
+//            StdOut.printf(names[0] + " SAYS: ");
+//
+//            for (int i = 0; i < t - k; i++) {
+//                char temp = model.random(kGram); // generate new random character
+//                StdOut.print(temp);
+//                kGram = kGram + temp;
+//                kGram = kGram.substring(1, k + 1); // remove first original character
+//            }
+//            StdOut.println(); // extra line for readability
+//        }
+
 
         // testing new frequency methods
-        for (String personString : organizedByPerson) {
-            splitString(personString);
-        }
-        for (String key : freqs.keySet())
-            System.out.println(key + ": " + freqs.get(key));
-
-        StdOut.print("\n\n\n\n");
-
-        Map<String, Integer> top10Main = topFrequencies();
-        for (String key : top10Main.keySet())
-            System.out.println(key);
-    }
-//
-    // print markov model for person n
-//        MarkovModel model = new MarkovModel(inputText, k);
-//        String kGram = inputText.substring(0, k); // kgram based on input text
-//        StdOut.printf(kGram);
-//
-//        for (int i = 0; i < t - k; i++) {
-//            char temp = model.random(kGram); // generate new random character
-//            StdOut.print(temp);
-//            kGram = kGram + temp;
-//            kGram = kGram.substring(1, k + 1); // remove first original character
+//        for (String personString : organizedByPerson) {
+//            splitString(personString);
 //        }
-//        StdOut.println(); // extra line for readability
-}
-}
+//        for (String key : freqs.keySet())
+//            System.out.println(key + ": " + freqs.get(key));
+//
+//        StdOut.print("\n\n\n\n");
+//
+//        Map<String, Integer> top10Main = topFrequencies();
+//        for (String key : top10Main.keySet())
+//            System.out.println(key);
 
-//extra shit
-////testing what StdIn counts for different strings
-////    public static void testStdIn() {
-////        while (!StdIn.isEmpty()) {
-////            System.out.println(StdIn.readString());
-////        }
-////    }
+
+    } //end of main
+
+} // end of class
