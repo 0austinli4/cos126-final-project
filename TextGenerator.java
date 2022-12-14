@@ -119,20 +119,64 @@ public class TextGenerator {
             String word = (temp.substring(position, index));
 
             /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
-
+            updateFrequencies(word);
 
             position = index + 1;
             temp = temp.substring(position);
             position = 0;
         }
+        updateFrequencies(temp);
         System.out.print(temp); //LAST WORD
     }
 
     public static void updateFrequencies(String word) {
-        if (!freqs.containsKey(word))
-            freqs.put(word, 1);
-        else
-            freqs.put(word, freqs.get(word) + 1);
+        if (word != null && !word.equals("")) {
+            if (!freqs.containsKey(word))
+                freqs.put(word, 1);
+            else
+                freqs.put(word, freqs.get(word) + 1);
+        }
+    }
+
+    public static String getLeast(Map<String, Integer> top10, String first) {
+        String least = first;
+
+        for (String key : top10.keySet()) {
+            if (top10.get(key) < top10.get(least)) {
+                least = key;
+            }
+        }
+        return least;
+    }
+
+
+    public static Map<String, Integer> topFrequencies() {
+        int first10Check = 0;
+        String firstString = "";
+
+        Map<String, Integer> top10 = new HashMap<String, Integer>();
+
+        for (String key : freqs.keySet()) {
+            if (first10Check > 10) {
+                break;
+            }
+
+            first10Check++;
+            top10.put(key, freqs.get(key));
+        }
+
+
+        for (String key : freqs.keySet()) {
+            String least = firstString;
+            least = getLeast(top10, least);
+            if (!key.equals(least)) {
+                if (freqs.get(key) > top10.get(least)) {
+                    top10.remove(least);
+                    top10.put(key, freqs.get(key));
+                }
+            }
+        }
+        return top10;
     }
 
     // Test generator creates trajectory of length t based on markov class
@@ -166,8 +210,21 @@ public class TextGenerator {
                 "really really like when I get to eat my mother good food always";
         System.out.print(first5last5("mother", tester));
 
+        // testing new frequency methods
+        for (String personString : organizedByPerson) {
+            splitString(personString);
+        }
+        for (String key : freqs.keySet())
+            System.out.println(key + ": " + freqs.get(key));
+
+        StdOut.print("\n\n\n\n");
+
+        Map<String, Integer> top10Main = topFrequencies();
+        for (String key : top10Main.keySet())
+            System.out.println(key);
+    }
 //
-        // print markov model for person n
+    // print markov model for person n
 //        MarkovModel model = new MarkovModel(inputText, k);
 //        String kGram = inputText.substring(0, k); // kgram based on input text
 //        StdOut.printf(kGram);
@@ -179,7 +236,7 @@ public class TextGenerator {
 //            kGram = kGram.substring(1, k + 1); // remove first original character
 //        }
 //        StdOut.println(); // extra line for readability
-    }
+}
 }
 
 //extra shit
