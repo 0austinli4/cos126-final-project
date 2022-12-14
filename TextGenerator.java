@@ -257,6 +257,7 @@ public class TextGenerator {
 //        System.out.println(commonWord(common));
 //        System.out.println(commonWord(tuesdaycomma));
 
+
         //TESTING KEY SENTENCES TESTING
         String tester = "I just be that motherfucker bumping n shit and then I just go to the gym and keep on " +
                 "eating shit because that's what i like to do when i come to the library so shit man";
@@ -281,10 +282,14 @@ public class TextGenerator {
 //        }
 
 
+        //first5last TESTING
+
+
         // testing new frequency methods
 //        for (String personString : organizedByPerson) {
 //            splitString(personString);
 //        }
+
 //        for (String key : freqs.keySet())
 //            System.out.println(key + ": " + freqs.get(key));
 //
@@ -293,7 +298,7 @@ public class TextGenerator {
 //        Map<String, Integer> top10Main = topFrequencies();
 //        for (String key : top10Main.keySet())
 //            System.out.println(key);
-
+//        StdOut.println(); // extra line for readability
 
     } //end of main
 
