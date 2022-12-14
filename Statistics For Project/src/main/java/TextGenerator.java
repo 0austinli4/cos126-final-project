@@ -39,8 +39,7 @@ public class TextGenerator {
 
     // helper method for inByPerson, removing common words such at time stamps, dates, months
     public static boolean commonWord(String input) {
-        String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|((Mon),?)|((Tue),?)|((Wed),?)|((Thu),?)|((Fri),?)" +
-                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)";
+        String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|(Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)(,?)|(Nov)|(Dec)|(null)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
@@ -62,51 +61,6 @@ public class TextGenerator {
         System.out.print(names[numPerson] + "'s texts: " + organized[numPerson]);
         return organized[numPerson];
     }
-
-    // SIMULATE A TEXT CONVERSATION
-    public static String simulate(String topicWords, String input2) {
-
-        String temp = input2;
-        int position = 0;
-        int index;
-        while (temp.contains(" ")) {
-            index = temp.indexOf(" ");
-            String word = (temp.substring(position, index));
-
-            /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
-
-            position = index + 1;
-            temp = temp.substring(position);
-            position = 0;
-        }
-        System.out.print(temp); //LAST WORD
-        return "";
-    }
-
-    public static String first5last5(String topicWord, String searchFile) {
-        StringBuilder keyWordString = new StringBuilder();
-        String temp = searchFile;
-
-        while (temp.contains(topicWord)) {
-            int index = temp.indexOf(topicWord);
-            System.out.println("index of mother is: " + index);
-            int range = 20;
-
-            if (index > range && index < (temp.length() - range - 5)) {
-                keyWordString.append(temp, index - range, index + 5 + range);
-                temp = temp.substring(index + range + 1);
-                System.out.println("temp is: " + temp);
-            } else if (index > (temp.length() - range - 5)) { //case for END OF STRING
-                keyWordString.append(temp, index - range, searchFile.length());
-                temp = "";
-            }
-            keyWordString.append("\n");
-
-        }
-
-        return keyWordString.toString();
-    }
-
 
     // splits larger text in string (i.e. full sentence) into individual strings -
     // maybe put them in an array? or just add code to this method for frequency table
@@ -155,30 +109,18 @@ public class TextGenerator {
         String splitStringTest = "I like to eat food";
         //splitString(splitStringTest);
 
-        //testing commonWord
-        String common = "Tue";
-        String tuesdaycomma = "Thu,";
-//        System.out.println(commonWord(common));
-//        System.out.println(commonWord(tuesdaycomma));
-
-        //first5last TESTING
-        String tester = "I really like to eat the food that my mother cooks every night when I come home and then I " +
-                "really really like when I get to eat my mother good food always";
-        System.out.print(first5last5("mother", tester));
-
-//
         // print markov model for person n
-//        MarkovModel model = new MarkovModel(inputText, k);
-//        String kGram = inputText.substring(0, k); // kgram based on input text
-//        StdOut.printf(kGram);
-//
-//        for (int i = 0; i < t - k; i++) {
-//            char temp = model.random(kGram); // generate new random character
-//            StdOut.print(temp);
-//            kGram = kGram + temp;
-//            kGram = kGram.substring(1, k + 1); // remove first original character
-//        }
-//        StdOut.println(); // extra line for readability
+        MarkovModel model = new MarkovModel(inputText, k);
+        String kGram = inputText.substring(0, k); // kgram based on input text
+        StdOut.printf(kGram);
+
+        for (int i = 0; i < t - k; i++) {
+            char temp = model.random(kGram); // generate new random character
+            StdOut.print(temp);
+            kGram = kGram + temp;
+            kGram = kGram.substring(1, k + 1); // remove first original character
+        }
+        StdOut.println(); // extra line for readability
     }
 }
 
