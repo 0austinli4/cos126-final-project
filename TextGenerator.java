@@ -206,9 +206,7 @@ public class TextGenerator {
 //        System.out.println(commonWord(tuesdaycomma));
 
         //first5last TESTING
-        String tester = "I really like to eat the food that my mother cooks every night when I come home and then I " +
-                "really really like when I get to eat my mother good food always";
-        System.out.print(first5last5("mother", tester));
+         
 
         // testing new frequency methods
         for (String personString : organizedByPerson) {
@@ -236,7 +234,6 @@ public class TextGenerator {
 //            kGram = kGram.substring(1, k + 1); // remove first original character
 //        }
 //        StdOut.println(); // extra line for readability
-}
 }
 
 //extra shit
