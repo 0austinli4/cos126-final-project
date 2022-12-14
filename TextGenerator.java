@@ -39,7 +39,8 @@ public class TextGenerator {
 
     // helper method for inByPerson, removing common words such at time stamps, dates, months
     public static boolean commonWord(String input) {
-        String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|(Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)(,?)|(Nov)|(Dec)|(null)";
+        String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|((Mon),?)|((Tue),?)|((Wed),?)|((Thu),?)|((Fri),?)" +
+                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
@@ -62,6 +63,51 @@ public class TextGenerator {
         return organized[numPerson];
     }
 
+    // SIMULATE A TEXT CONVERSATION
+    public static String simulate(String topicWords, String input2) {
+
+        String temp = input2;
+        int position = 0;
+        int index;
+        while (temp.contains(" ")) {
+            index = temp.indexOf(" ");
+            String word = (temp.substring(position, index));
+
+            /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
+
+            position = index + 1;
+            temp = temp.substring(position);
+            position = 0;
+        }
+        System.out.print(temp); //LAST WORD
+        return "";
+    }
+
+    public static String first5last5(String topicWord, String searchFile) {
+        StringBuilder keyWordString = new StringBuilder();
+        String temp = searchFile;
+
+        while (temp.contains(topicWord)) {
+            int index = temp.indexOf(topicWord);
+            System.out.println("index of mother is: " + index);
+            int range = 20;
+
+            if (index > range && index < (temp.length() - range - 5)) {
+                keyWordString.append(temp, index - range, index + 5 + range);
+                temp = temp.substring(index + range + 1);
+                System.out.println("temp is: " + temp);
+            } else if (index > (temp.length() - range - 5)) { //case for END OF STRING
+                keyWordString.append(temp, index - range, searchFile.length());
+                temp = "";
+            }
+            keyWordString.append("\n");
+
+        }
+
+        return keyWordString.toString();
+    }
+
+
     // splits larger text in string (i.e. full sentence) into individual strings -
     // maybe put them in an array? or just add code to this method for frequency table
     public static void splitString(String input) {
@@ -73,64 +119,20 @@ public class TextGenerator {
             String word = (temp.substring(position, index));
 
             /* INSERT YOUR METHOD HERE - WHATEVER YOU WANT TO DO WITH THIS STRING */
-            updateFrequencies(word); // added to update frequencies for hash map
+
 
             position = index + 1;
             temp = temp.substring(position);
             position = 0;
         }
-        updateFrequencies((temp));
         System.out.print(temp); //LAST WORD
     }
 
     public static void updateFrequencies(String word) {
-        if (word != null && !word.equals("")) {
-            if (!freqs.containsKey(word))
-                freqs.put(word, 1);
-            else
-                freqs.put(word, freqs.get(word) + 1);
-        }
-    }
-
-    public static String getLeast(Map<String, Integer> top10, String first) {
-        String least = first;
-
-        for (String key : top10.keySet()) {
-            if (top10.get(key) < top10.get(least)) {
-                least = key;
-            }
-        }
-        return least;
-    }
-
-
-    public static Map<String, Integer> topFrequencies() {
-        int first10Check = 0;
-        String firstString = "";
-
-        Map<String, Integer> top10 = new HashMap<String, Integer>();
-
-        for (String key : freqs.keySet()) {
-            if (first10Check > 10) {
-                break;
-            }
-
-            first10Check++;
-            top10.put(key, freqs.get(key));
-        }
-
-
-        for (String key : freqs.keySet()) {
-            String least = firstString;
-            least = getLeast(top10, least);
-            if (!key.equals(least)) {
-                if (freqs.get(key) > top10.get(least)) {
-                    top10.remove(least);
-                    top10.put(key, freqs.get(key));
-                }
-            }
-        }
-        return top10;
+        if (!freqs.containsKey(word))
+            freqs.put(word, 1);
+        else
+            freqs.put(word, freqs.get(word) + 1);
     }
 
     // Test generator creates trajectory of length t based on markov class
@@ -153,31 +155,30 @@ public class TextGenerator {
         String splitStringTest = "I like to eat food";
         //splitString(splitStringTest);
 
+        //testing commonWord
+        String common = "Tue";
+        String tuesdaycomma = "Thu,";
+//        System.out.println(commonWord(common));
+//        System.out.println(commonWord(tuesdaycomma));
+
+        //first5last TESTING
+        String tester = "I really like to eat the food that my mother cooks every night when I come home and then I " +
+                "really really like when I get to eat my mother good food always";
+        System.out.print(first5last5("mother", tester));
+
+//
         // print markov model for person n
-        MarkovModel model = new MarkovModel(inputText, k);
-        String kGram = inputText.substring(0, k); // kgram based on input text
-        StdOut.printf(kGram);
-
-        for (int i = 0; i < t - k; i++) {
-            char temp = model.random(kGram); // generate new random character
-            StdOut.print(temp);
-            kGram = kGram + temp;
-            kGram = kGram.substring(1, k + 1); // remove first original character
-        }
-        StdOut.println(); // extra line for readability
-
-        // testing new frequency methods
-        for (String personString : organizedByPerson) {
-            splitString(personString);
-        }
-        for (String key : freqs.keySet())
-            System.out.println(key + ": " + freqs.get(key));
-
-        StdOut.print("\n\n\n\n");
-
-        Map<String, Integer> top10Main = topFrequencies();
-        for (String key : top10Main.keySet())
-            System.out.println(key);
+//        MarkovModel model = new MarkovModel(inputText, k);
+//        String kGram = inputText.substring(0, k); // kgram based on input text
+//        StdOut.printf(kGram);
+//
+//        for (int i = 0; i < t - k; i++) {
+//            char temp = model.random(kGram); // generate new random character
+//            StdOut.print(temp);
+//            kGram = kGram + temp;
+//            kGram = kGram.substring(1, k + 1); // remove first original character
+//        }
+//        StdOut.println(); // extra line for readability
     }
 }
 
