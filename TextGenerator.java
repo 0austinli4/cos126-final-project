@@ -35,7 +35,6 @@ public class TextGenerator {
         for (int i = 0; i < individualText.length; i++) {
             //System.out.println(names[i] + ": " + individualText[i]);
             individualText[i] = removeSymbols(individualText[i]); // removes symbols
-            //+ "\n"
             // new line at end of every string for readability
         }
         return individualText; //returns String array
@@ -44,7 +43,7 @@ public class TextGenerator {
     // helper method for inByPerson, removing common words such at time stamps, dates, months
     public static boolean commonWord(String input) {
         String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|((Mon),?)|((Tue),?)|((Wed),?)|((Thu),?)|((Fri),?)" +
-                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)|(,)|(^)";
+                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)|(,)|(^)|(Reply)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
@@ -169,7 +168,7 @@ public class TextGenerator {
     }
 
 
-    //DATA ANALYSIS SECTIONS
+    // DATA ANALYSIS SECTIONS
     // splits strings and updates frequency tables
     public static void splitString(String input) {
         String[] splitString = input.split(" +");
@@ -200,31 +199,66 @@ public class TextGenerator {
     }
 
     public static Map<String, Integer> topFrequencies() {
-        int first10Check = 0;
-        String firstString = "";
-
-        Map<String, Integer> top10 = new HashMap<String, Integer>();
-
-        for (String key : freqs.keySet()) {
-            if (first10Check > 10) {
-                break;
-            }
-            first10Check++;
-            top10.put(key, freqs.get(key));
-        }
-
-        for (String key : freqs.keySet()) {
-            String least = firstString;
-            least = getLeast(top10, least);
-            if (!key.equals(least)) {
-                if (freqs.get(key) > top10.get(least)) {
-                    top10.remove(least);
-                    top10.put(key, freqs.get(key));
+        Map<String, Integer> tempFreq = freqs;
+        Map<String, Integer> top10 = new HashMap<>();
+        int max = 0;
+        String maxKey = new String();
+        for (int i = 0; i < 10; i++) {
+            for (String key : tempFreq.keySet()) {
+                if (freqs.get(key) > max && !genericWord(key)) {
+                    max = freqs.get(key);
+                    maxKey = key;
+                    tempFreq.put(key, 0);
                 }
             }
+            top10.put(maxKey, max);
+            max = 0;
+            maxKey = new String();
         }
         return top10;
     }
+
+    public static boolean genericWord(String input) {
+        String re = "(the)|(and)|(a)|(to)|(in)|(is)|(you)|(that)|(it)|(he)|(was)|" +
+                "(for)|(on)|(are)|(as)|(with)|(his)|(they)|(i)|(at)|(be)|(this)|(have)|" +
+                "(from)|(or)|(one)|(had)|(by)|(word)|(but)|(not)|(what)|(all)|(were)|(we)" +
+                "|(when)|(your)|(can)|(said)|(there)|(use)|(am)|(each)|(which)|(1)" +
+                "|(do)|(how)|(their)|(if)|(will)|(up)|(other)|(about)|(out)|(many)" +
+                "|(then)|(them)|(these)|(so)|(some)|(her)|(would)|(make)|(like)|(him)" +
+                "|(into)|(time)|(has)|(just)|(rn)|(ok)|(me)|(now)|(i)|(no)|(way)|(im)|(u)|(guys)|(my)|(here)|(r)|(of)|(get)|(go)|(I)|(oh)";
+        //"(could)|(people)|(my)|(than)|(first)|(been)|(call)|(who)|(oil)|(its)|(now)”;
+        Pattern pattern = Pattern.compile(re);
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
+    }
+
+//    public static Map<String, Integer> topFrequencies() {
+//        int first10Check = 0;
+//        String firstString = "";
+//
+//        Map<String, Integer> top10 = new HashMap<String, Integer>();
+//
+//        for (String key : freqs.keySet()) {
+//            if (first10Check > 10) {
+//                break;
+//            }
+//            first10Check++;
+//            top10.put(key, freqs.get(key));
+//            firstString = key;
+//        }
+//
+//        for (String key : freqs.keySet()) {
+//            String least = firstString;
+//            least = getLeast(top10, least);
+//            if (!key.equals(least)) {
+//                if (freqs.get(key) > top10.get(least)) {
+//                    top10.remove(least);
+//                    top10.put(key, freqs.get(key));
+//                }
+//            }
+//        }
+//        return top10;
+//    }
 
     // Test generator creates trajectory of length t based on markov class
     public static void main(String[] args) {
@@ -236,7 +270,7 @@ public class TextGenerator {
         String[] organizedByPerson = cleanText(names);
         deleteNull(organizedByPerson);
 
-        simulateMarkov(k, t, organizedByPerson, 1, 2, "come");
+        //simulateMarkov(k, t, organizedByPerson, 1, 2, "come");
 
         //testing delete null
         // String[] nuller = {"null adiawndowi"};
@@ -281,25 +315,21 @@ public class TextGenerator {
 //            StdOut.println(); // extra line for readability
 //        }
 
-
-        //first5last TESTING
-
-
         // testing new frequency methods
-//        for (String personString : organizedByPerson) {
-//            splitString(personString);
-//        }
-
+        for (String personString : organizedByPerson) {
+            splitString(personString);
+        }
 //        for (String key : freqs.keySet())
 //            System.out.println(key + ": " + freqs.get(key));
-//
-//        StdOut.print("\n\n\n\n");
-//
-//        Map<String, Integer> top10Main = topFrequencies();
-//        for (String key : top10Main.keySet())
-//            System.out.println(key);
-//        StdOut.println(); // extra line for readability
 
+        StdOut.println("\n" + "TOP TEN");
+
+        Map<String, Integer> top10Main = topFrequencies();
+
+        for (String key : top10Main.keySet())
+            System.out.println(key);
+        StdOut.println(); // extra line for readability
     } //end of main
+
 
 } // end of class
