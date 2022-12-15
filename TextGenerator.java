@@ -43,7 +43,7 @@ public class TextGenerator {
     // helper method for inByPerson, removing common words such at time stamps, dates, months
     public static boolean commonWord(String input) {
         String re = "([1-9]?[1-9]:[0-9][0-9])|(AM|PM)|((Mon),?)|((Tue),?)|((Wed),?)|((Thu),?)|((Fri),?)" +
-                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)|(,)|(^)|(Reply)";
+                "|((Sat),?)|((Sun),?)|((Nov),?)|((Dec),?)|(null)|(,)|(^)|(Reply)|(Replies)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
@@ -125,10 +125,10 @@ public class TextGenerator {
         MarkovModel model1 = new MarkovModel(inputText1, k);
         MarkovModel model2 = new MarkovModel(inputText2, k);
 
-        int stringPosition = 0;
         for (int count = 0; count < 4; count++) {
+            int randPosition = StdRandom.uniformInt(0, inputText1.length() - k - 1);
             //PERSON 1
-            String kGram = inputText1.substring(stringPosition, k + stringPosition); // kgram based on input text
+            String kGram = inputText1.substring(randPosition, randPosition + k); // kgram based on input text
             StdOut.printf(names[person1] + " SAYS: " + kGram);
 
             for (int i = 0; i < t - k; i++) {
@@ -140,7 +140,7 @@ public class TextGenerator {
             StdOut.println(); // extra line for readability
 
             //PERSON 2
-            String kGram1 = inputText2.substring(stringPosition, k + stringPosition); // kgram based on input text
+            String kGram1 = inputText2.substring(randPosition, randPosition + k); // kgram based on input text
             StdOut.printf(names[person2] + " SAYS: " + kGram1);
 
             for (int i = 0; i < t - k; i++) {
@@ -151,7 +151,6 @@ public class TextGenerator {
             }
             StdOut.println(); // extra line for readability
 
-            stringPosition++;
         }
     }
 
@@ -173,11 +172,11 @@ public class TextGenerator {
     public static void splitString(String input) {
         String[] splitString = input.split(" +");
         for (String s : splitString) {
-            //System.out.println(s);
             updateFrequencies(s);
         }
     }
 
+    // update frequencies of various words
     public static void updateFrequencies(String word) {
         if (word != null && !word.equals("")) {
             if (!freqs.containsKey(word))
@@ -187,22 +186,11 @@ public class TextGenerator {
         }
     }
 
-    public static String getLeast(Map<String, Integer> top10, String first) {
-        String least = first;
-
-        for (String key : top10.keySet()) {
-            if (top10.get(key) < top10.get(least)) {
-                least = key;
-            }
-        }
-        return least;
-    }
-
     public static Map<String, Integer> topFrequencies() {
         Map<String, Integer> tempFreq = freqs;
         Map<String, Integer> top10 = new HashMap<>();
         int max = 0;
-        String maxKey = new String();
+        String maxKey = "";
         for (int i = 0; i < 10; i++) {
             for (String key : tempFreq.keySet()) {
                 if (freqs.get(key) > max && !genericWord(key)) {
@@ -225,40 +213,14 @@ public class TextGenerator {
                 "|(when)|(your)|(can)|(said)|(there)|(use)|(am)|(each)|(which)|(1)" +
                 "|(do)|(how)|(their)|(if)|(will)|(up)|(other)|(about)|(out)|(many)" +
                 "|(then)|(them)|(these)|(so)|(some)|(her)|(would)|(make)|(like)|(him)" +
-                "|(into)|(time)|(has)|(just)|(rn)|(ok)|(me)|(now)|(i)|(no)|(way)|(im)|(u)|(guys)|(my)|(here)|(r)|(of)|(get)|(go)|(I)|(oh)";
-        //"(could)|(people)|(my)|(than)|(first)|(been)|(call)|(who)|(oil)|(its)|(now)”;
+                "|(into)|(time)|(has)|(just)|(rn)|(ok)|(me)|(now)|(i)|(no)|(way)|(im)" +
+                "|(u)|(guys)|(my)|(here)|(r)|(of)|(get)|(go)|(I)|(oh)|(Im)|(where)|(come)" +
+                "|(anyone)|(Yes)|(its)|(wanna)|(No)|(Ok)|(still)|(ur)";
         Pattern pattern = Pattern.compile(re);
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();
     }
 
-//    public static Map<String, Integer> topFrequencies() {
-//        int first10Check = 0;
-//        String firstString = "";
-//
-//        Map<String, Integer> top10 = new HashMap<String, Integer>();
-//
-//        for (String key : freqs.keySet()) {
-//            if (first10Check > 10) {
-//                break;
-//            }
-//            first10Check++;
-//            top10.put(key, freqs.get(key));
-//            firstString = key;
-//        }
-//
-//        for (String key : freqs.keySet()) {
-//            String least = firstString;
-//            least = getLeast(top10, least);
-//            if (!key.equals(least)) {
-//                if (freqs.get(key) > top10.get(least)) {
-//                    top10.remove(least);
-//                    top10.put(key, freqs.get(key));
-//                }
-//            }
-//        }
-//        return top10;
-//    }
 
     // Test generator creates trajectory of length t based on markov class
     public static void main(String[] args) {
@@ -270,7 +232,7 @@ public class TextGenerator {
         String[] organizedByPerson = cleanText(names);
         deleteNull(organizedByPerson);
 
-        //simulateMarkov(k, t, organizedByPerson, 1, 2, "come");
+        simulateMarkov(k, t, organizedByPerson, 1, 2, "come");
 
         //testing delete null
         // String[] nuller = {"null adiawndowi"};
@@ -321,14 +283,13 @@ public class TextGenerator {
         }
 //        for (String key : freqs.keySet())
 //            System.out.println(key + ": " + freqs.get(key));
-
-        StdOut.println("\n" + "TOP TEN");
+        //      StdOut.println("\n" + "TOP TEN");
 
         Map<String, Integer> top10Main = topFrequencies();
 
-        for (String key : top10Main.keySet())
-            System.out.println(key);
-        StdOut.println(); // extra line for readability
+//        for (String key : top10Main.keySet())
+//            System.out.println(key);
+//        StdOut.println(); // extra line for readability
     } //end of main
 
 
