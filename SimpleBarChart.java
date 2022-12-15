@@ -89,7 +89,7 @@ public class SimpleBarChart extends JPanel {
         System.out.println("MARKOV SIMULATION TEXTS BETWEEN 2 PEOPLE");
 
         //3, 5 have to do with the index of array in names
-        TextGenerator.simulateMarkov(k, t, organizedByPerson, 3, 5, "go");
+        TextGenerator.simulateMarkov(k, t, organizedByPerson, 3, 5, "eat");
 
         System.out.println(); //readability
 
