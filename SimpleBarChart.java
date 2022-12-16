@@ -1,5 +1,6 @@
-// file that implements TextGenerator and Markov and displays graphic
-// of frequencies
+// implements all methods from textGenerator
+// and displays data in a barChart implemented
+// from java swing
 
 // CODE FROM
 // https://www.roseindia.net/java/example/java/swing/draw-simple-bar-chart.shtml
@@ -11,11 +12,15 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Map;
 
+// implements all methods from textGenerator
+// and displays data in a barChart implemented
+// from java swing
 public class SimpleBarChart extends JPanel {
     private double[] value;
     private String[] languages;
     private String title;
 
+    // constructor for building barchart
     public SimpleBarChart(double[] val, String[] lang, String t) {
         languages = lang;
         value = val;
@@ -88,8 +93,13 @@ public class SimpleBarChart extends JPanel {
         TextGenerator.deleteNull(organizedByPerson);
         System.out.println("MARKOV SIMULATION TEXTS BETWEEN 2 PEOPLE");
 
+
         //3, 5 have to do with the index of array in names
-        TextGenerator.simulateMarkov(k, t, organizedByPerson, 3, 5, "eat");
+        String topicWord = "eat";
+        int person1 = 3;
+        int person2 = 5;
+        TextGenerator.simulateMarkov(k, t, organizedByPerson,
+                person1, person2, topicWord);
 
         System.out.println(); //readability
 
@@ -118,6 +128,12 @@ public class SimpleBarChart extends JPanel {
         }
         frame.getContentPane().add(new SimpleBarChart(value, words,
                 "Most Common Words"));
+
+        /*TEST BAR GRAPH*/
+//        double[] testValue = {1, 2, 3};
+//        String[] testWords = {"apple", "me", "you"};
+//        frame.getContentPane().add(new SimpleBarChart(testValue, testWords,
+//                "Test Common Words"));
 
         WindowListener winListener = new WindowAdapter() {
             public void windowClosing(WindowEvent event) {

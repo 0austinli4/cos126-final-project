@@ -1,3 +1,6 @@
+// prints out strings based on order and
+// length using frequency of strings
+// predicts based on characters before current char
 public class MarkovModel {
     private ST<String, Integer> oneArg; // frequency of each kgram
 

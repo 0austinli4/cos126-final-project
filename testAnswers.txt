@@ -1,0 +1,90 @@
+NOTE: This text file is the expected results of each test from TextGenerator.java main component
+
+*TEST 1: cleanText, deleteNull, removeSymbols*
+
+What happens tomorrow
+Dead
+GOOD LUCK SOPHIE
+wtf
+y whats up
+Where we going
+
+*TEST 2: commonWords*
+true
+true
+false
+true
+
+*TEST 3: keySentences*
+
+**topic word in string**
+I really like to eat food that's why i eat it every day.
+TMRW IS THE DAY T
+S ITS DOMINANCE ON THE KINGDOMMy favorite type of food in the united states of americais bannasn! I thin
+k it's the best type of food out of all the ones out there!
+
+**topic word not in string**
+key words weren't found
+I really like to eat food that's why i eat it every day.
+TMRW IS THE DAY THE USA REASSERTS ITS DOMINANCE ON THE KINGDOMMy favorite type of food in the united states of americais bannasn! I think it's the best type of food out of all the ones out there!
+
+*TEST 4: markovSimulate*
+The text messages were customized to include a lot of mentions about food, and were empirically tested 10-15 times for randomness
+Should include mentions of USA, or best food - you can look at test.txt to see where they mention food
+
+*TEST 5: SplitString and Update Frequency*
+banana: 7
+a: 2
+like: 1
+university: 1
+I: 1
+marshmallow: 2
+water: 4
+food: 8
+apricot: 1
+lot: 1
+apple: 2
+computer: 1
+pizza: 3
+princeton: 1
+eat: 1
+to: 1
+every: 2
+day: 4
+mark: 3
+
+*TEST 6: TopFrequencies and genericWord*
+banana: 7
+apple: 2
+pizza: 3
+university: 1
+marshmallow: 2
+water: 4
+day: 4
+every: 2
+food: 8
+mark: 3
+
+*TEST 7: DisplayStats*
+
+TOP SPEAKERS IN THE CHAT
+
+0: David wrote 404 characters!
+1: Sophie wrote 188 characters!
+2: Jasmine wrote 1 characters!
+
+MOST COMMON WORDS IN THE CHAT
+
+WORD 1: banana was said 7 times!
+WORD 2: apple was said 2 times!
+WORD 3: pizza was said 3 times!
+WORD 4: university was said 1 times!
+WORD 5: marshmallow was said 2 times!
+WORD 6: water was said 4 times!
+WORD 7: day was said 4 times!
+WORD 8: every was said 2 times!
+WORD 9: food was said 8 times!
+WORD 10: mark was said 3 times!
+
+
+

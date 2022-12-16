@@ -1,3 +1,5 @@
+// imports data from text file and splits into
+// individual arrays for each person
 // generates text simulations of markov model and finds
 // frequencies of words in text files
 
@@ -6,16 +8,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//generates text simulations of markov model and finds frequencies
 public class TextGenerator {
 
+    // represents frequency of each string in text file
     static Map<String, Integer> freqs = new HashMap<>();
 
     // splits text file up into parallel string arrays matching by person
     // implements cleanText and commonWord methods to remove times/symbols/unnecessary symbols
+    // returns array of strings based on names
     public static String[] cleanText(String[] names) {
         String[] individualText = new String[names.length];
 
         int person = 0;
+        // reading in strings based on people's names
         while (!StdIn.isEmpty()) {
             String word = StdIn.readString();
             for (int j = 0; j < names.length; j++) {
@@ -27,14 +33,16 @@ public class TextGenerator {
                     break;
                 }
             }
-
+            // preventing words from imessage generated text
             if (!commonWord(word)) {
                 individualText[person] = individualText[person] + word + " ";
             }
         }
-
+        //remomves null text and symbols based on ascii table
         for (int i = 0; i < individualText.length; i++) {
-            individualText[i] = removeSymbols(individualText[i]); // removes symbols
+            if (individualText[i] != null) {
+                individualText[i] = removeSymbols(individualText[i]); // removes symbols
+            }
         }
         return individualText; //returns String array
     }
@@ -55,6 +63,7 @@ public class TextGenerator {
 
     // helper method for cleanText, removes all non-ascii characters
     // (such as symbols) and returns the String
+    // returns string without symbols
     private static String removeSymbols(String text) {
 
         StringBuilder cleanText = new StringBuilder();
@@ -70,9 +79,11 @@ public class TextGenerator {
 
     // splits larger sentence strings into sections of keyword strings
     // finds index of keyWord --> takes text 20 char before and after it
+    // returns string including the key phrases
     private static String keySentence(String topicWord, String searchFile) {
         StringBuilder keyWordString = new StringBuilder();
         String temp = searchFile;
+
 
         // searches a string for a word, then adds to the text
         // +/- 50 characters from that string and returns it
@@ -132,9 +143,9 @@ public class TextGenerator {
         MarkovModel model2 = new MarkovModel(inputText2, k);
 
         int min = Math.min(inputText1.length(), inputText2.length());
-
-        // loop through for 4 text messages
-        for (int count = 0; count < 4; count++) {
+        int numOfTexts = 4;
+        // loop through for numOfTexts text messages
+        for (int count = 0; count < numOfTexts; count++) {
 
             // markov model starts at a random position
             // in input text rather than first position,
@@ -174,18 +185,17 @@ public class TextGenerator {
     // individual people, to prevent null objects and
     // new line breaks
     public static void deleteNull(String[] organizedByPerson) {
-
         for (int i = 0; i < organizedByPerson.length; i++) {
-            if (organizedByPerson[i].contains("null")) {
-                organizedByPerson[i] = organizedByPerson[i].replaceAll("null", "");
+            if (organizedByPerson[i] != null) {
+                if (organizedByPerson[i].contains("null")) {
+                    organizedByPerson[i] = organizedByPerson[i].replaceAll("null", "");
+                }
+                if (organizedByPerson[i].contains("\n")) {
+                    organizedByPerson[i] = organizedByPerson[i].replaceAll("\n", "");
+                }
             }
-            if (organizedByPerson[i].contains("\n")) {
-                organizedByPerson[i] = organizedByPerson[i].replaceAll("\n", "");
-            }
-
         }
     }
-
 
     /* DATA ANALYSIS SECTIONS */
 
@@ -199,6 +209,7 @@ public class TextGenerator {
     }
 
     // helper method for splitString,
+    // updates frequencies of strings in hashmap
     private static void updateFrequencies(String word) {
         if (word != null && !word.equals("")) {
             if (!freqs.containsKey(word))
@@ -209,28 +220,32 @@ public class TextGenerator {
     }
 
     // finds the top 10 frequent strings and places in HashMap
+    // returns hashmap of top 10 strings
     public static Map<String, Integer> topFrequencies() {
         Map<String, Integer> tempFreq = freqs;
+
         Map<String, Integer> top10 = new HashMap<>();
+
         int max = 0;
         String maxKey = "";
         for (int i = 0; i < 10; i++) {
             for (String key : tempFreq.keySet()) {
-                if (freqs.get(key) > max && !genericWord(key)) {
-                    max = freqs.get(key);
+                if (tempFreq.get(key) > max && !genericWord(key)) {
+                    max = tempFreq.get(key);
                     maxKey = key;
-                    tempFreq.put(key, 0);
                 }
             }
             top10.put(maxKey, max);
+            tempFreq.put(maxKey, 0);
             max = 0;
-            maxKey = new String();
+            maxKey = "";
         }
         return top10;
     }
 
     // removes generic words from frequency hashMap using Regex
-    // code taken from: https://gist.github.com/gravitymonkey/2406023
+    // returns true if string matches
+    // list of common words taken from: https://gist.github.com/gravitymonkey/2406023
     private static boolean genericWord(String input) {
         String re = "(the)|(and)|(a)|(to)|(in)|(is)|(you)|(that)|(it)|(he)|(was)|" +
                 "(for)|(on)|(are)|(as)|(with)|(his)|(they)|(i)|(at)|(be)|(this)|(have)|" +
@@ -290,53 +305,69 @@ public class TextGenerator {
 
         // initiating an array with all texts person has sent from text file
         String[] names = {"Jasmine", "Sol", "irene", "David", "Joshua", "Sophie"};
-        String[] organizedByPerson = cleanText(names);
 
-        //*******************************************TESTS****************************************
-        // removing null spaces and new line breaks
+        //*ALL TEXTS SHOULD INPUT TEST.TXT IN ORDER TO PREVENT PRINTING OF TOO MANY LINES*//
+
+        // *TESTS FOR CLEANTEXT, deleteNull, and RemoveSymbols
+        // note: since deleteNull and RemoveSymbols both rely on null values that we can't recreate in strings
+        // and we only find in textFiles, we are testing the methods together
+        String[] organizedByPerson = cleanText(names);
         deleteNull(organizedByPerson);
 
+        System.out.println("TEST 1: cleanText + deleteNull + removeSymbols  \n SHOULD PRINT ALL " +
+                "THE TEXTS PERSON AT INDEX 0 HAS SENT," +
+                "without any nulls or symbols, [IT SHOULD MATCH JASMINE.TXT" +
+                "WITHOUT NEW LINES");
+        System.out.println(organizedByPerson[0] + "\n");
+
+        //TESTING COMMON WORD
+        String[] commonWords = {"12:09", "Reply", "food", "AM"};
+        System.out.println("TEST 2: commonWords");
+        for (String word : commonWords) {
+            System.out.println(commonWord(word));
+        }
+        System.out.println("\n");
+
+        //TESTING KEY SENTENCE
+        System.out.println("TEST 3: should print 50 characters before and after every instance of key word" +
+                ", including if it's close to the end / beginning. \n should print ");
+
+        String testKeys = "I really like to eat food that's why i eat it every day. \n" +
+                "TMRW IS THE DAY THE USA REASSERTS ITS DOMINANCE ON THE KINGDOM" +
+                "My favorite type of food in the united states of america" +
+                "is bannasn! I think it's the best type of food out of all the ones out there!";
+
+        System.out.println(keySentence("food", testKeys)); // case for topic word in sentence
+        System.out.println(keySentence("england", testKeys)); // case for topic word not in sentence
+
+        System.out.println("\n\n\n");
         // simulates markov over topic word
-        // the 4th and 5th arguments correspond to people from names array
-        simulateMarkov(k, t, organizedByPerson, 1, 2, "going");
+        System.out.println("TEST 4: simulates markov based on topic, print 4 lines each: " + "\n");
+        simulateMarkov(k, t, organizedByPerson, 3, 5, "food");
 
-        //testing delete null
+        //TESTING splitString and update frequencies *split string implements updating frequencies"
+        System.out.println("\n\n\n");
+        System.out.println("TEST 5: tests splitString and updateFrequencies, printing frequency chart");
+        String splitter = "I like to pizza mark mark mark eat a marshmallow banana apple apple apricot " +
+                "food computer princeton marshmallow banana banana banana banana " +
+                "university every food day every water water water water banana " +
+                "food a lot food banana food pizza food pizza food day day day food";
+        splitString(splitter);
 
-        // String[] null = {"null adiawndowi"};
-        //deleteNull(null);
-        //System.out.print(nuller[0]);
+        for (String key : freqs.keySet()) {
+            System.out.println(key + ": " + freqs.get(key));
+        }
 
-        //printing an individual person's texts
+        System.out.println("\n\n\n");
+        System.out.println("TEST 6: TopFrequencies and genericWord");
+        Map<String, Integer> topOnes = topFrequencies();
+        for (String key : topOnes.keySet()) {
+            System.out.println(key + ": " + topOnes.get(key));
+        }
 
-        //String inputText = organizedByPerson[5];
-        //System.out.print(inputText);
-
-        //TESTING splitString
-        // String splitStringTest = "I like to eat food";
-        // splitString(splitStringTest);
-
-        //testing commonWord
-        //String common = "Tue";
-        //String tuesdaycomma = "Thu,";
-        //System.out.println(commonWord(common));
-        //System.out.println(commonWord(tuesdaycomma));
-
-        //TESTING KEY SENTENCES TESTING
-        //String tester = "I really like to eat food that's why i eat it every day. My favorite type of Food " +
-        //"is bannasn! I think it's the best type of food out of all the ones out there!";
-        //System.out.print(keySentence("shit", tester));
-
-        // testing new frequency methods
-        //for (String personString : organizedByPerson) {
-        //splitString(personString);
-        //}
-        //for (String key : freqs.keySet())
-        //    System.out.println(key + ": " + freqs.get(key));
-        //    StdOut.println("\n" + "TOP TEN");
-        //
-        //Map<String, Integer> top10Main = topFrequencies();
-        //displayStats(organizedByPerson, names, top10Main);
+        System.out.println("\n\n\n");
+        System.out.println("TEST 7: TopFrequencies and genericWord");
+        displayStats(organizedByPerson, names, topOnes);
     }
-
 
 }
